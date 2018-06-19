@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Plant Hardiness Zone Map</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <link href="https://api.mapbox.com/mapbox-assembly/v0.21.2/assembly.min.css" rel="stylesheet">
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class='grid bg-gray-dark absolute h-full w-full'>
+    <div class='col col--12 border-b border--white color-white'>
+      <h1 class='txt-h2 mx36 my24 inline-block'>Plant Hardiness Zone Map</h1>
+      <p class='fr mr24 mt36'>Source: <a class='link' target='_blank' href='http://www.prism.oregonstate.edu/projects/plant_hardiness_zones.php'>USDA Plant Hardiness Zone GIS Datasets</a></p>
+    </div>
+    <div class='col col--12 h-full relative'>
+      <div id='map' class='w-full h-full'></div>
+      <div id='legend' class='w180 bg-white absolute top right mt18 mr18 round shadow-darken10 px12 py12 txt-s none'>
+        <strong class='block mb6 txt-l'>Zones</strong>
+        <ul class='ul mb6'></ul>
+      </div>
+    </div>
+  </div>
+
+  <script async defer src="https://api.mapbox.com/mapbox-assembly/v0.21.2/assembly.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js'></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+    // access token
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3RpbmV3b29kd2FyZCIsImEiOiJjamRqYTFkeGkxbWp4MzNwNGFqeWV4eXNoIn0.TeQcpE5u4tQ5zQGa983aJg';
+
+    // create a new map
+    var map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'mapbox://styles/mapbox/dark-v9', // stylesheet location
+      center: [2.28, 11.77], // starting position [lng, lat]
+      zoom: 1.2 // starting zoom
+    });
+
+    // object associating GRIDCODES to color values
+    var colorCodes = {
+      5: "#00364e",
+      6: "#045275",
+      7: "#00718b",
+      8: "#089099",
+      9: "#46aea0",
+      10: "#7ccba2",
+      11: "#b7e6a5",
+      12: "#f7feae",
+      13: "#fcde9c",
+      14: "#faa476",
+      15: "#f0746e",
+      16: "#e34f6f",
+      17: "#dc3977",
+      18: "#b9257a",
+      19: "#7c1d6f",
+      20: "#941c84",
+      21: "#c610ad",
+      22: "#f40cd4"
+    }
+
+    // when the map is done loading
+    map.on('load', function() {
+
+      // request our GEOJSON data
+      d3.json('data/phm.json')
+        .then(function(geojson) {
+          console.log(geojson);
+
+          addLayer(geojson);
+          //addLegend(geojson);
+          //addInteraction();
+        });
+
+    });
+
+    function addLayer(geojson) {
+      // add the GeoJSON data as a mapbox gl layer
+      map.addLayer({
+        'id': 'phz',
+        'type': 'fill',
+        'source': {
+          'type': 'geojson',
+          'data': geojson // use the data as the data source
+        },
+        'paint': {
+          "fill-color": "#00364e",
+          "fill-opacity": .75
+        }
+      });
+    }
+  </script>
+
+</body>
+
+</html>
