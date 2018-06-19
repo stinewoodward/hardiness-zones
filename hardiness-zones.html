@@ -77,8 +77,8 @@
           console.log(geojson);
 
           addLayer(geojson);
-          //addLegend(geojson);
-          //addInteraction();
+          addLegend(geojson);
+          addInteraction();
         });
 
     });
@@ -93,10 +93,89 @@
           'data': geojson // use the data as the data source
         },
         'paint': {
-          "fill-color": "#00364e",
+          "fill-color": [
+            "match", // match the numbers below to the GRIDCODES
+            ["number", ["get", "GRIDCODE"]],
+            5, colorCodes[5],
+            6, colorCodes[6],
+            7, colorCodes[7],
+            8, colorCodes[8],
+            9, colorCodes[9],
+            10, colorCodes[10],
+            11, colorCodes[11],
+            12, colorCodes[12],
+            13, colorCodes[13],
+            14, colorCodes[14],
+            15, colorCodes[15],
+            16, colorCodes[16],
+            17, colorCodes[17],
+            18, colorCodes[18],
+            19, colorCodes[19],
+            20, colorCodes[20],
+            21, colorCodes[21],
+            22, colorCodes[22],
+            "#000000" // default for no match
+          ],
           "fill-opacity": .75
         }
       });
+
+      // map will flyTo the bounds provided
+      map.fitBounds([-129.07, 23.02, -65.74, 50.53], {
+        padding: {
+          top: 12,
+          bottom: 18,
+          left: 12,
+          right: 220
+        }
+      });
+
+      var onZoomend = function() {
+        // set the max bounds
+        map.setMaxBounds(map.getBounds())
+
+        // display the legend
+        d3.select('#legend').classed('none', false);
+
+        // remove the listener
+        map.off('zoomend', onZoomend);
+      };
+
+      // when the map is done zooming
+      map.on('zoomend', onZoomend);
+    }
+
+    function addLegend(geojson) {
+
+      // build it an object for associated GRIDECODES
+      // with the Zone descriptions from the data
+      var labelCodes = {},
+        code;
+
+      // loop through all the features
+      geojson.features.forEach(function(feature) {
+        // shortcut for the code
+        code = feature.properties.GRIDCODE;
+        // if it's not in our labelsCodes object yet
+        if (!labelCodes[code]) {
+          // create it and assign the Zone description
+          labelCodes[code] = feature.properties.ZONE
+        }
+      })
+
+      // empty stringn for building our list items
+      var listItems = '';
+      // loop through all the colorCodes
+      for (var code in colorCodes) {
+        listItems += "<li class='li h-full txt-m'><span class='w24 h18 mt6 fl mr12' style='background:" + colorCodes[code] + "'></span>" + labelCodes[code] + "</li>"
+      }
+      // select the legend ul element and insert the HTML list items
+      d3.select("#legend ul").html(listItems);
+
+    }
+
+    function addInteraction(geojson) {
+
     }
   </script>
 
