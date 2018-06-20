@@ -78,7 +78,7 @@
 
           addLayer(geojson);
           addLegend(geojson);
-          addInteraction();
+          addInteraction(geojson);
         });
 
     });
@@ -176,6 +176,24 @@
 
     function addInteraction(geojson) {
 
+      // create popup
+      var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+      });
+
+      map.on('mousemove', 'phz', function(e) {
+        // get coordinates of pointer when it moves over the layer
+        var coordinates = e.lngLat;
+
+        // set the coordinates of the popup to the pointer position
+        // and populate the popup with the zone info
+        popup.setLngLat(coordinates)
+          .setHTML('<b>Zone ' +
+            e.features[0].properties.ZONE +
+            '</b>')
+          .addTo(map);
+      });
     }
   </script>
 
